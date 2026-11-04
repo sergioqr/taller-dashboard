@@ -1,10 +1,21 @@
 Te adjunto el backend TXT y el Index.html de mi dashboard de Google Apps Script. Realiza estos cambios:
 
-1. **Lectura de datos:** acepta números guardados como texto o con coma decimal, elimina espacios sobrantes e ignora filas vacías. Ordena los periodos correctamente: P1, P2… P10.
-2. **Gráfico de evolución:** muestra siempre el promedio de todo el curso según los filtros de sección y curso. Al buscar estudiantes, agrega una línea naranja punteada para compararlos con el curso, sin modificar el promedio general.
-3. **Distribución por periodo:** agrega en P1–P4 cajas verdes que muestren el 50 % central de las notas, la mediana, el mínimo y el máximo, calculados sobre los promedios de cada estudiante en cada curso. Incluye etiquetas legibles, leyenda y una explicación breve. Mantén la escala de 0 a 20.
-4. **Tabla de resumen:** en Evolución, agrega “Rango de notas por periodo”, con cantidad de estudiantes, mínimo, Q1, mediana, Q3, máximo y promedio. Respeta sección y curso, pero ignora el buscador. Si no hay datos, indícalo.
-5. **Gráfico de distribución:** usa únicamente números enteros en el eje vertical y ajusta su máximo al siguiente múltiplo de 4.
+Lectura de datos: acepta números guardados como texto o con coma decimal, elimina espacios sobrantes e ignora filas vacías. Ordena los periodos correctamente: P1, P2… P10.
+​2. Gráfico de evolución: muestra siempre el promedio de todo el curso según los filtros de sección y curso. Al buscar estudiantes, agrega una línea naranja punteada para compararlos con el curso, sin modificar el promedio general.
+
+Distribución por periodo: agrega en P1–P4 cajas verdes que muestren el 50 % central de las notas, la mediana, el mínimo y el máximo, calculados sobre los promedios de cada estudiante en cada curso. Incluye etiquetas legibles, leyenda y una explicación breve. Mantén la escala de 0 a 20.
+
+Tabla de resumen: en Evolución, agrega “Rango de notas por periodo”, con cantidad de estudiantes, mínimo, Q1, mediana, Q3, máximo y promedio. Respeta sección y curso, pero ignora el buscador. Si no hay datos, indícalo.
+
+Gráfico de distribución: usa únicamente números enteros en el eje vertical y ajusta su máximo al siguiente múltiplo de 4.
+
+Exportar a Excel (CSV): agrega un botón simple para descargar la tabla que se esté viendo en pantalla con un solo clic.
+
+Filtro rápido de alertas: añade una casilla o botón para ver de inmediato solo a los alumnos que tengan alertas de nota, asistencia o entregas.
+
+Detalles en gráficos (tooltips): muestra una pequeña etiqueta con el valor exacto al pasar el cursor sobre los puntos o barras.
+
+Etiquetas visuales en alertas: cambia el texto largo de revisión por distintivos o colores según el tipo de problema (rojo para nota baja, naranja para asistencia, azul para tareas).
 
 Conserva el resto del diseño, las pestañas, los filtros y la lógica de cálculo existente. Prueba los cambios con datos de ejemplo.
 
