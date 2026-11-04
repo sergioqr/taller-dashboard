@@ -1,0 +1,52 @@
+VISION 360 · INTERFAZ WEB PARA APPS SCRIPT
+
+Este codigo conserva el estilo de la referencia: barra superior, pestanas, busqueda, filtros laterales, tarjetas y panel principal. Aplica ese estilo al dashboard de aprendizaje. 
+
+ARCHIVOS
+Backend_web.gs: codigo del servidor. Tambien disponible como Backend_web_para_copiar.txt.
+Index.html: interfaz completa con HTML, CSS y JavaScript. Tambien disponible como Index_para_copiar.txt.
+Datos_40_estudiantes.xlsx: las mismas cuatro fuentes del taller.
+
+VISTA PREVIA
+Abrir Index.html en un navegador local muestra una DEMO claramente rotulada con los 40 alumnos ficticios. No se conecta a Google desde disco. En Apps Script, la interfaz llama a obtenerDatos y lee las hojas configuradas. Si hay error de configuracion o permisos, lo muestra sin sustituirlo por datos de demostracion.
+
+INSTALACION PASO A PASO
+1. Subir el Excel a Drive y convertirlo a Google Sheets nativo. Conservar las hojas Alumnos, Evaluaciones, Asistencia y Actividades.
+2. Crear un proyecto NUEVO de Apps Script desde https://script.google.com . Este proyecto es independiente del script anterior que generaba graficos dentro de Sheets.
+3. Pegar Backend_web.gs completo en Codigo.gs. No mezclar ambos codigos: comparten nombres de funciones.
+4. En el servidor reemplazar PEGAR_ID_DEL_GOOGLE_SHEET por el ID de la hoja convertida. En https://docs.google.com/spreadsheets/d/ABC123/edit, el ID es ABC123, no la URL completa.
+5. Pulsar + junto a Archivos, elegir HTML y nombrar Index. Pegar todo el contenido de Index.html. Guardar.
+6. Seleccionar obtenerDatos y Ejecutar para verificar la lectura y autorizar el acceso de su propio proyecto a la hoja. Si la cuenta institucional bloquea Apps Script, coordinar con TI.
+7. Implementar > Nueva implementacion > Aplicacion web. Para la primera prueba personal: ejecutar como Yo y acceso Solo yo. Elegir la opcion equivalente disponible en su cuenta y autorizar. Copiar la URL /exec que devuelve Google.
+8. Abrir esa URL: debe indicar GOOGLE SHEETS y mostrar los datos. No se necesita API de IA, clave, BigQuery, servidor externo ni biblioteca de graficos.
+9. Cambiar periodo, seccion, curso o buscar un ID: los filtros se actualizan de inmediato en el navegador.
+10. Cambiar datos en las hojas y pulsar Actualizar datos: vuelve a leer y validar todas las fuentes. Esta version no necesita la hoja Integrada ni ejecutar el script del taller.
+11. Tras modificar el codigo de una implementacion existente: Implementar > Gestionar implementaciones > Editar > Nueva version > Implementar. La URL /dev de pruebas muestra el codigo guardado a editores del proyecto.
+
+PERMISOS PARA UN TALLER
+Cada docente puede desplegar su propia copia con acceso Solo yo. Para compartir una aplicacion con mas personas, definir el publico y los permisos deliberadamente. Si se ejecuta como Yo, los visitantes autorizados de la app pueden ver los datos leidos bajo los permisos del propietario. Si se ejecuta como el usuario que accede, cada usuario debe autorizar y tener acceso a la hoja. Las opciones dependen de la cuenta y la politica del dominio. El codigo no restringe datos por docente ni implementa roles por seccion.
+
+QUE MUESTRA
+Resumen: promedio, porcentaje de registros alumno-curso con nota >=11, asistencia deduplicada por estudiante, cobertura, tendencia, distribucion y detalle.
+Estudiantes: tabla por estudiante-curso del periodo actual.
+Competencias: promedio y cobertura por curso-competencia del periodo.
+Evolucion: tendencia en todos los periodos y diferencias pareadas ultimo-primer periodo de los mismos pares estudiante-curso.
+Filtros de curso y seccion y busqueda por codigo afectan todas las vistas. Los indicadores usan el periodo seleccionado. Tendencia y tabla longitudinal usan todos los periodos.
+
+PERSONALIZACION
+Colores: variables CSS al inicio de Index.html, especialmente --green y --bg.
+Titulo: texto Vision 360 dentro de la etiqueta header.
+Umbrales: objeto CFG al inicio de Backend_web.gs.
+La escala 0-20 y los cortes son reglas del taller. Los vacios se mantienen como faltantes. La asistencia global no se duplica por curso. La demo mantiene esos mismos umbrales.
+No incluir datos reales en la constante DEMO. La constante incluida contiene solo datos ficticios del taller.
+
+PROMPT PARA ADAPTAR CON IA
+Adjunto Backend_web.gs e Index.html y una imagen de referencia. Conserva el esquema de datos, validaciones y denominadores. Adapta la interfaz al estilo de la imagen con barra superior, pestanas, busqueda, panel lateral y panel principal. Usa HTML, CSS y JavaScript sin dependencias externas ni APIs de pago, google.script.run para leer datos y estados visibles de carga, vacio y error. Mantiene accesibilidad, diseno movil e impresion. No uses innerHTML con datos de las hojas. Devuelve los dos archivos completos y explica los cambios. Agrega [FUNCIONALIDAD DESEADA] sin modificar las fuentes.
+
+VALIDACION
+Pruebas locales de sintaxis y DOM simulado: carga de 80 registros en P4, filtro seccion A/Matematica con 20 registros, busqueda EST001, vistas de evolucion y competencias y estado sin resultados. La revision visual en navegador queda pendiente. Nucleo de integracion probado con duplicados, vacios, cero y valores fuera de rango. La autorizacion y el despliegue real en Google se deben comprobar en su cuenta.
+
+DOCUMENTACION OFICIAL
+https://developers.google.com/apps-script/guides/web
+https://developers.google.com/apps-script/guides/html/communication
+https://developers.google.com/apps-script/guides/services/quotas

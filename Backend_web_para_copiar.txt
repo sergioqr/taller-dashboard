@@ -1,0 +1,61 @@
+// Proyecto independiente para la interfaz web. Sustituir ID_HOJA.
+const ID_HOJA = 'PEGAR_ID_DEL_GOOGLE_SHEET';
+const CFG = {aprobacion:11, asistencia:0.85, entrega:0.8};
+function doGet() {
+ return HtmlService.createHtmlOutputFromFile('Index').setTitle('Vision 360 · Ciencias').addMetaTag('viewport','width=device-width, initial-scale=1');
+}
+function obtenerDatos() {
+ if(ID_HOJA==='PEGAR_ID_DEL_GOOGLE_SHEET') throw Error('Configurar ID_HOJA con el ID de su Google Sheet nativo.');
+ const ss=SpreadsheetApp.openById(ID_HOJA);
+ function leer(n,h){
+  const sh=ss.getSheetByName(n);if(!sh)throw Error('Falta hoja '+n);
+  const a=sh.getDataRange().getValues();
+  if(h.some((v,i)=>a[0][i]!==v))throw Error('Encabezados incorrectos en '+n);
+  return a.slice(1).filter(r=>r.slice(0,h.length).some(v=>v!=='')).map(r=>r.slice(0,h.length));
+ }
+ const alumnos=leer('Alumnos',['Alumno_ID','Seccion']);
+ const evaluaciones=leer('Evaluaciones',['Alumno_ID','Periodo','Curso','Competencia','Nota']);
+ const asistencia=leer('Asistencia',['Alumno_ID','Periodo','Programadas','Asistidas']);
+ const actividades=leer('Actividades',['Alumno_ID','Periodo','Curso','Asignadas','Entregadas']);
+ const r=procesar(alumnos,evaluaciones,asistencia,actividades);
+ return {alumnos:alumnos,integrada:r.filas,evaluaciones:evaluaciones,config:CFG,actualizado:new Date().toISOString(),demo:false};
+}
+function numero(x,min,max,etiqueta) {
+  if(typeof x!=='number'||!Number.isFinite(x)||x<min||x>max) throw Error('Valor invalido: '+etiqueta+' = '+x);
+  return x;
+}
+function clave(...x) {return JSON.stringify(x);}
+function promedio(a) {return a.length?a.reduce((s,x)=>s+x,0)/a.length:null;}
+function unico(map,k,v,etiqueta) {
+  if(map.has(k)) throw Error('Clave duplicada: '+etiqueta+' '+k);
+  map.set(k,v);
+}
+// Nucleo independiente: puede probarse sin conectarse a Google.
+function procesar(alumnos,evals,asist,act) {
+  const am=new Map(), sm=new Map(), tm=new Map(), gm=new Map(), vistos=new Map();
+  alumnos.forEach(r=>{if(!r[0]||!r[1]) throw Error('Alumno sin codigo/seccion');unico(am,r[0],r,'Alumnos');});
+  function referencia(r){if(!am.has(r[0])) throw Error('Alumno desconocido: '+r[0]); if(!r[1]) throw Error('Periodo vacio');}
+  asist.forEach(r=>{referencia(r);numero(r[2],1,1000,'programadas');numero(r[3],0,r[2],'asistidas');unico(sm,clave(r[0],r[1]),r,'Asistencia');});
+  act.forEach(r=>{referencia(r);if(!r[2]) throw Error('Curso vacio');numero(r[3],1,1000,'asignadas');numero(r[4],0,r[3],'entregadas');unico(tm,clave(r[0],r[1],r[2]),r,'Actividades');});
+  evals.forEach(r=>{
+    referencia(r); if(!r[2]||!r[3]) throw Error('Curso o competencia vacios');
+    unico(vistos,clave(r[0],r[1],r[2],r[3]),true,'Evaluaciones');
+    if(r[4]!=='') numero(r[4],0,20,'nota');
+    const k=clave(r[0],r[1],r[2]);
+    if(!gm.has(k))gm.set(k,{id:r[0],p:r[1],c:r[2],notas:[],esperadas:0});
+    const g=gm.get(k);g.esperadas++;if(r[4]!=='')g.notas.push(r[4]);
+  });
+  let faltaAsistencia=0,faltaActividad=0,sinNota=0;
+  const filas=[...gm.values()].map(g=>{
+    const s=sm.get(clave(g.id,g.p)),t=tm.get(clave(g.id,g.p,g.c));
+    if(!s)faltaAsistencia++;if(!t)faltaActividad++;if(!g.notas.length)sinNota++;
+    const n=promedio(g.notas),ar=s?s[3]/s[2]:null,tr=t?t[4]/t[3]:null;
+    const motivos=[];
+    if(n!==null&&n<CFG.aprobacion)motivos.push('Nota');
+    if(ar!==null&&ar<CFG.asistencia)motivos.push('Asistencia');
+    if(tr!==null&&tr<CFG.entrega)motivos.push('Entregas');
+    if(!s||!t||g.notas.length<g.esperadas)motivos.push('Datos incompletos');
+    return [g.id,am.get(g.id)[1],g.p,g.c,n===null?'':n,ar===null?'':ar,tr===null?'':tr,g.notas.length,g.esperadas,motivos.join(', ')||'Sin alertas'];
+  }).sort((a,b)=>a[2].localeCompare(b[2])||a[0].localeCompare(b[0])||a[3].localeCompare(b[3]));
+  return {filas,diagnostico:[['Alumnos unicos',am.size],['Evaluaciones',evals.length],['Notas vacias',evals.filter(r=>r[4]==='').length],['Filas integradas alumno-periodo-curso',filas.length],['Filas sin asistencia vinculada',faltaAsistencia],['Filas sin actividades vinculadas',faltaActividad],['Grupos sin ninguna nota',sinNota]]};
+}
