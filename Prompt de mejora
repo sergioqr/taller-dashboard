@@ -1,130 +1,21 @@
-Te adjunto el backend TXT y el Index.html de mi dashboard de Google Apps Script. Mejora ambos archivos para que sean útiles para un docente que evalúa por competencias y necesita identificar avances, dificultades y estudiantes que requieren acompañamiento.
+Te adjunto el backend TXT y el Index.html de mi dashboard de seguimiento por competencias. Mejora lo siguiente:
 
-Conserva el diseño general, las pestañas, los filtros y las funciones existentes. Realiza los siguientes cambios:
+1. **Calificaciones:** lee AD, A, B y C y calcula con AD = 4, A = 3, B = 2 y C = 1. Muestra promedios con dos decimales. Las celdas vacías deben quedar como “Sin evaluar”.
 
-**1. Lectura y valoración de las calificaciones**
+2. **Datos:** elimina espacios sobrantes, acepta minúsculas y números con coma decimal en asistencia y tareas. Ignora filas vacías y ordena los periodos P1, P2… P10.
 
-La columna “Nota” contiene letras. Utiliza exclusivamente esta equivalencia para los cálculos:
+3. **Evolución:** muestra el promedio del grupo según sección y curso. Al buscar un estudiante, agrega una línea naranja punteada para compararlo con el grupo, sin cambiar el promedio general. Usa escala de 1 a 4.
 
-- AD – Logro destacado: 4.
-- A – Logro esperado: 3.
-- B – En proceso: 2.
-- C – En inicio: 1.
+4. **Avance:** muestra las calificaciones por estudiante y competencia en cada periodo. Indica si avanzó, se mantuvo o retrocedió, comparando la misma competencia y sin tratar los vacíos como cero.
 
-Acepta letras en minúsculas y elimina espacios sobrantes. Ignora filas completamente vacías. Para asistencia y actividades, acepta números guardados como texto o con coma decimal.
+5. **Resumen:** muestra el promedio, el porcentaje de A y AD, los estudiantes con competencias en B o C y las evaluaciones pendientes.
 
-Una calificación vacía significa “Sin evaluar”: no debe convertirse en cero ni en C. Si aparece una calificación inválida, informa la hoja y la fila para corregirla.
+6. **Gráficos:** muestra cuántas calificaciones hay de cada letra y cómo cambian los resultados entre periodos. Agrega etiquetas con los valores al pasar el cursor.
 
-Ordena los periodos correctamente: P1, P2… P10.
+7. **Alertas:** agrega filtros rápidos para encontrar estudiantes con dificultades, retrocesos, evaluaciones pendientes, baja asistencia o tareas sin entregar. Usa distintivos breves y colores fáciles de entender.
 
-**2. Cálculos y presentación de resultados**
+8. **Descarga:** agrega un botón para descargar cada tabla visible en CSV, respetando los filtros.
 
-Convierte las letras a sus valores antes de calcular promedios, diferencias o indicadores. Muestra los promedios con dos decimales, en escala de 1 a 4, sin redondear los valores antes de hacer los cálculos.
+Conserva el diseño, las pestañas y los filtros actuales. Prueba los cambios con la base adjunta.
 
-Conserva la ponderación actual y explica brevemente cómo se calcula cada promedio. No conviertas automáticamente un promedio decimal a una letra ni presentes esta equivalencia como una norma oficial de promoción.
-
-Mantén visible una leyenda breve: C = 1, B = 2, A = 3 y AD = 4.
-
-**3. Indicadores útiles para el docente**
-
-En el periodo seleccionado, muestra:
-
-- Promedio numérico de las valoraciones.
-- Porcentaje de calificaciones A o AD sobre las calificaciones disponibles.
-- Cantidad de estudiantes con al menos una competencia en B o C.
-- Cobertura de evaluación: calificaciones disponibles respecto de las esperadas.
-
-Distingue entre cantidad de estudiantes únicos y cantidad de evaluaciones o registros alumno-curso. Un promedio alto no debe ocultar que un estudiante tiene una competencia en C.
-
-Conserva la información de asistencia y entregas en las vistas correspondientes.
-
-**4. Evolución del curso y comparación con estudiantes**
-
-El gráfico de evolución debe mostrar siempre el promedio del grupo definido por sección y curso, ignorando el buscador y el filtro de alertas.
-
-Al buscar un estudiante, agrega una línea naranja punteada con sus promedios para compararlos con el grupo, sin modificar la línea general. Si la búsqueda devuelve varios estudiantes, identifica claramente que la segunda línea representa el promedio del conjunto encontrado.
-
-Utiliza una escala fija de 1 a 4. No unas puntos a través de periodos sin calificaciones.
-
-**5. Seguimiento del avance por competencia**
-
-Permite revisar, para cada estudiante, curso y competencia:
-
-- La letra y el valor numérico de cada periodo.
-- El cambio entre los periodos comparados.
-- Si avanzó, permaneció igual o retrocedió.
-- Si no existe información suficiente para comparar.
-
-Compara únicamente la misma competencia del mismo curso. Una calificación faltante no debe generar un avance o retroceso artificial.
-
-Prioriza visualmente las competencias que permanecen en C, retroceden o siguen sin evaluar. Usa expresiones como “Requiere acompañamiento”, evitando etiquetas definitivas sobre el estudiante.
-
-**6. Distribución de resultados por periodo**
-
-En Evolución, incorpora diagramas de caja para los periodos disponibles, calculados sobre los promedios de cada estudiante en cada curso.
-
-Muestra Q1, mediana, Q3, mínimo y máximo. Las cajas verdes representan el 50 % central y los extremos representan el mínimo y el máximo. Utiliza escala de 1 a 4, etiquetas legibles, leyenda y una explicación breve.
-
-Agrega la tabla “Rango de valoraciones por periodo” con:
-
-Periodo, estudiantes únicos, registros alumno-curso con promedio, mínimo, Q1, mediana, Q3, máximo y promedio.
-
-Esta distribución y su tabla deben respetar sección y curso, pero ignorar el buscador y el filtro de alertas. Excluye los promedios sin datos e informa cuando un periodo no tenga resultados.
-
-**7. Distribución de niveles y competencias por reforzar**
-
-El gráfico de barras debe contar las calificaciones originales C, B, A y AD, no clasificar promedios decimales como si fueran letras.
-
-Muestra cantidad y porcentaje por nivel. Usa únicamente números enteros en el eje de cantidades y ajusta el máximo al múltiplo de 4 superior o igual al mayor conteo.
-
-En Competencias, incorpora una tabla que permita identificar cuáles necesitan mayor atención, con:
-
-Curso, competencia, promedio numérico, cantidad en C, cantidad en B, porcentaje en A/AD y cantidad sin evaluar.
-
-**8. Filtros rápidos de acompañamiento**
-
-Agrega controles sencillos para mostrar:
-
-- Estudiantes con competencias en B o C.
-- Estudiantes con retrocesos comparables.
-- Estudiantes con evaluaciones pendientes.
-- Estudiantes con alertas de asistencia o entregas.
-
-Estos filtros deben afectar las tablas de seguimiento y sus contadores, conservando el promedio general del grupo en el gráfico comparativo.
-
-Si un filtro depende de comparar periodos, indica cuáles se están utilizando.
-
-**9. Alertas claras y detalles en gráficos**
-
-Reemplaza los textos largos de revisión por distintivos breves:
-
-- Rojo: competencia en C.
-- Amarillo: competencia en B.
-- Naranja: asistencia baja.
-- Azul: entregas insuficientes.
-- Gris: sin evaluar.
-
-Incluye texto o iconos para que el significado no dependa únicamente del color. Conserva los umbrales de asistencia y entregas configurados.
-
-Al pasar el cursor por puntos, barras o cajas, muestra los valores y el contexto correspondiente: periodo, nivel, cantidad, porcentaje o estadísticos. Distingue resultados de aprendizaje de alertas de asistencia y entregas.
-
-**10. Exportación de tablas**
-
-Agrega un botón para descargar en CSV la tabla visible, respetando los filtros aplicables. Si una pestaña contiene varias tablas, coloca un botón en cada una.
-
-El archivo debe abrir correctamente en Excel, conservar tildes y encabezados, y exportar valores legibles. No exportes datos ocultos por los filtros.
-
-**11. Verificación y entrega**
-
-Prueba con la base adjunta y con casos de ejemplo que incluyan:
-
-- A, AD, B, A: promedio 3.00.
-- Calificaciones vacías y letras inválidas.
-- Periodos P1, P2 y P10.
-- Competencias faltantes al comparar periodos.
-- Filtros combinados.
-- Estudiantes con buen promedio general y alguna competencia en C.
-
-Verifica que el buscador no modifique el promedio general del grupo, que los vacíos no se conviertan en cero y que todos los cálculos de calificaciones utilicen la escala de 1 a 4.
-
-Devuélveme el backend TXT y el Index.html completos, listos para pegar en Apps Script, junto con un resumen breve de los cambios y las pruebas realizadas. No incluyas datos de ejemplo dentro de los archivos finales ni modifiques las hojas fuente.
+Devuélveme ambos archivos completos, listos para pegar en Apps Script, con un resumen breve de los cambios.
