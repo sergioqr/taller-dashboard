@@ -1,21 +1,7 @@
-Te adjunto el backend TXT y el Index.html de mi dashboard de seguimiento por competencias. Mejora lo siguiente:
+Te adjunto el backend y el archivo Index.html de un dashboard de análisis de notas de estudiantes. Las calificaciones van de C a AD y cada letra tiene una equivalencia numérica definida en el código.
 
-1. **Calificaciones:** lee AD, A, B y C y calcula con AD = 4, A = 3, B = 2 y C = 1. Muestra promedios con dos decimales. Las celdas vacías deben quedar como “Sin evaluar”.
-
-2. **Datos:** elimina espacios sobrantes, acepta minúsculas y números con coma decimal en asistencia y tareas. Ignora filas vacías y ordena los periodos P1, P2… P10.
-
-3. **Evolución:** muestra el promedio del grupo según sección y curso. Al buscar un estudiante, agrega una línea naranja punteada para compararlo con el grupo, sin cambiar el promedio general. Usa escala de 1 a 4.
-
-4. **Avance:** muestra las calificaciones por estudiante y competencia en cada periodo. Indica si avanzó, se mantuvo o retrocedió, comparando la misma competencia y sin tratar los vacíos como cero.
-
-5. **Resumen:** muestra el promedio, el porcentaje de A y AD, los estudiantes con competencias en B o C y las evaluaciones pendientes.
-
-6. **Gráficos:** muestra cuántas calificaciones hay de cada letra y cómo cambian los resultados entre periodos. Agrega etiquetas con los valores al pasar el cursor.
-
-7. **Alertas:** agrega filtros rápidos para encontrar estudiantes con dificultades, retrocesos, evaluaciones pendientes, baja asistencia o tareas sin entregar. Usa distintivos breves y colores fáciles de entender.
-
-8. **Descarga:** agrega un botón para descargar cada tabla visible en CSV, respetando los filtros.
-
-Conserva el diseño, las pestañas y los filtros actuales. Prueba los cambios con la base adjunta.
-
-Devuélveme ambos archivos completos, listos para pegar en Apps Script, con un resumen breve de los cambios.
+Realiza los siguientes cambios:
+1. Avance por periodo: en el gráfico de P1, P2, P3 y P4, agrega un boxplot con la distribución de notas del salón y una línea con su promedio. Al seleccionar un alumno, muestra su avance para compararlo con el salón, sin modificar los valores del grupo.
+2. Nivel de riesgo: indica el riesgo de cada alumno y explica brevemente los criterios utilizados.
+3. Reporte individual: incluye recomendaciones según los resultados por evaluación, concepto o competencia y curso. Señala qué aspectos debe reforzar y qué competencias ha logrado.
+Conserva la escala de notas, el diseño, las pestañas y los filtros existentes. Prueba los cambios con datos de ejemplo y entrégame los dos archivos completos y actualizados: backend e Index.html.
