@@ -1,23 +1,45 @@
 // Proyecto independiente para la interfaz web. Sustituir ID_HOJA.
 const ID_HOJA = 'PEGAR_ID_DEL_GOOGLE_SHEET';
-const CFG = {aprobacion:11, asistencia:0.85, entrega:0.8};
+// Umbral de seguimiento editable: 3 equivale a A (Logro esperado).
+const CFG = {aprobacion:3, asistencia:0.85, entrega:0.8,
+ escala:{AD:4,A:3,B:2,C:1},
+ niveles:{AD:'Logro destacado',A:'Logro esperado',B:'En proceso',C:'En inicio'}};
+function limpiar(x,tipo) {
+ if(x===null||x===undefined||String(x).trim()==='')return '';
+ if(tipo==='T')return String(x).trim();
+ return typeof x==='number'?x:Number(String(x).trim().replace(',','.'));
+}
+function valorNota(x) {
+ const letra=limpiar(x,'T').toUpperCase();
+ if(letra==='')return '';
+ if(!Object.prototype.hasOwnProperty.call(CFG.escala,letra))
+   throw Error('Calificación inválida: '+x+'. Use únicamente AD, A, B o C; deje vacíos los datos faltantes.');
+ return CFG.escala[letra];
+}
+function convertirEvaluaciones(evals) {
+ return evals.map((r,i)=>{
+  try {return [...r.slice(0,4),valorNota(r[4]),limpiar(r[4],'T').toUpperCase()];}
+  catch(e){throw Error('Evaluaciones, fila '+(i+2)+' ('+r[0]+', '+r[1]+', '+r[2]+', '+r[3]+'): '+e.message);}
+ });
+}
 function doGet() {
  return HtmlService.createHtmlOutputFromFile('Index').setTitle('Vision 360 · Ciencias').addMetaTag('viewport','width=device-width, initial-scale=1');
 }
 function obtenerDatos() {
  if(ID_HOJA==='PEGAR_ID_DEL_GOOGLE_SHEET') throw Error('Configurar ID_HOJA con el ID de su Google Sheet nativo.');
  const ss=SpreadsheetApp.openById(ID_HOJA);
- function leer(n,h){
+ function leer(n,h,tipos){
   const sh=ss.getSheetByName(n);if(!sh)throw Error('Falta hoja '+n);
   const a=sh.getDataRange().getValues();
-  if(h.some((v,i)=>a[0][i]!==v))throw Error('Encabezados incorrectos en '+n);
-  return a.slice(1).filter(r=>r.slice(0,h.length).some(v=>v!=='')).map(r=>r.slice(0,h.length));
+  if(h.some((v,i)=>String(a[0][i]).trim()!==v))throw Error('Encabezados incorrectos en '+n);
+  return a.slice(1).filter(r=>r.slice(0,h.length).some(v=>v!=='')).map(r=>r.slice(0,h.length).map((x,i)=>limpiar(x,tipos[i])));
  }
- const alumnos=leer('Alumnos',['Alumno_ID','Seccion']);
- const evaluaciones=leer('Evaluaciones',['Alumno_ID','Periodo','Curso','Competencia','Nota']);
- const asistencia=leer('Asistencia',['Alumno_ID','Periodo','Programadas','Asistidas']);
- const actividades=leer('Actividades',['Alumno_ID','Periodo','Curso','Asignadas','Entregadas']);
- const r=procesar(alumnos,evaluaciones,asistencia,actividades);
+ const alumnos=leer('Alumnos',['Alumno_ID','Seccion'],'TT');
+ const evaluacionesFuente=leer('Evaluaciones',['Alumno_ID','Periodo','Curso','Competencia','Nota'],'TTTTT');
+ const asistencia=leer('Asistencia',['Alumno_ID','Periodo','Programadas','Asistidas'],'TTNN');
+ const actividades=leer('Actividades',['Alumno_ID','Periodo','Curso','Asignadas','Entregadas'],'TTTNN');
+ const evaluaciones=convertirEvaluaciones(evaluacionesFuente);
+ const r=procesar(alumnos,evaluacionesFuente,asistencia,actividades);
  return {alumnos:alumnos,integrada:r.filas,evaluaciones:evaluaciones,config:CFG,actualizado:new Date().toISOString(),demo:false};
 }
 function numero(x,min,max,etiqueta) {
@@ -32,6 +54,7 @@ function unico(map,k,v,etiqueta) {
 }
 // Nucleo independiente: puede probarse sin conectarse a Google.
 function procesar(alumnos,evals,asist,act) {
+  evals=convertirEvaluaciones(evals);
   const am=new Map(), sm=new Map(), tm=new Map(), gm=new Map(), vistos=new Map();
   alumnos.forEach(r=>{if(!r[0]||!r[1]) throw Error('Alumno sin codigo/seccion');unico(am,r[0],r,'Alumnos');});
   function referencia(r){if(!am.has(r[0])) throw Error('Alumno desconocido: '+r[0]); if(!r[1]) throw Error('Periodo vacio');}
@@ -40,7 +63,7 @@ function procesar(alumnos,evals,asist,act) {
   evals.forEach(r=>{
     referencia(r); if(!r[2]||!r[3]) throw Error('Curso o competencia vacios');
     unico(vistos,clave(r[0],r[1],r[2],r[3]),true,'Evaluaciones');
-    if(r[4]!=='') numero(r[4],0,20,'nota');
+    if(r[4]!=='') numero(r[4],1,4,'valor de competencia');
     const k=clave(r[0],r[1],r[2]);
     if(!gm.has(k))gm.set(k,{id:r[0],p:r[1],c:r[2],notas:[],esperadas:0});
     const g=gm.get(k);g.esperadas++;if(r[4]!=='')g.notas.push(r[4]);
@@ -51,7 +74,7 @@ function procesar(alumnos,evals,asist,act) {
     if(!s)faltaAsistencia++;if(!t)faltaActividad++;if(!g.notas.length)sinNota++;
     const n=promedio(g.notas),ar=s?s[3]/s[2]:null,tr=t?t[4]/t[3]:null;
     const motivos=[];
-    if(n!==null&&n<CFG.aprobacion)motivos.push('Nota');
+    if(n!==null&&n<CFG.aprobacion)motivos.push('Logro por reforzar');
     if(ar!==null&&ar<CFG.asistencia)motivos.push('Asistencia');
     if(tr!==null&&tr<CFG.entrega)motivos.push('Entregas');
     if(!s||!t||g.notas.length<g.esperadas)motivos.push('Datos incompletos');
