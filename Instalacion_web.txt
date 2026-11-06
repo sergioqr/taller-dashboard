@@ -13,7 +13,7 @@ Abrir Index.html en un navegador local muestra una DEMO claramente rotulada con 
 INSTALACION PASO A PASO
 1. Subir el Excel a Drive y convertirlo a Google Sheets nativo. Conservar las hojas Alumnos, Evaluaciones, Asistencia y Actividades.
 2. Crear un proyecto NUEVO de Apps Script desde https://script.google.com . Este proyecto es independiente del script anterior que generaba graficos dentro de Sheets.
-3. Pegar Backend_web.gs completo en Codigo.gs. No mezclar ambos codigos: comparten nombres de funciones.
+3. Pegar Backend_web_para_copiar.txt completo en Codigo.gs. No mezclar ambos codigos: comparten nombres de funciones.
 4. En el servidor reemplazar PEGAR_ID_DEL_GOOGLE_SHEET por el ID de la hoja convertida. En https://docs.google.com/spreadsheets/d/ABC123/edit, el ID es ABC123, no la URL completa.
 5. Pulsar + junto a Archivos, elegir HTML y nombrar Index. Pegar todo el contenido de Index.html. Guardar.
 6. Seleccionar obtenerDatos y Ejecutar para verificar la lectura y autorizar el acceso de su propio proyecto a la hoja. Si la cuenta institucional bloquea Apps Script, coordinar con TI.
